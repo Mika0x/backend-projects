@@ -111,8 +111,7 @@ GitHub Activity Summary for Mika0x
 ## 🧠 How It Works
 
 1.  The CLI accepts a GitHub username as input
-2.  Sends a request to:
-    https://api.github.com/users/`<username>`{=html}/events
+2.  Sends a request to: `https://api.github.com/users/<username>/events`
 3.  Parses the JSON response
 4.  Groups events by type and repository
 5.  Converts events into readable sentences using a formatter module
