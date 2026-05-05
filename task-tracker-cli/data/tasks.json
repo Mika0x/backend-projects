@@ -1,0 +1,30 @@
+[
+    {
+        "id": 2,
+        "description": "Watch a Scary Movie Later",
+        "status": "TODO",
+        "createdAt": "2026-05-04T15:31:28.706989",
+        "updatedAt": "2026-05-04T15:31:28.706989"
+    },
+    {
+        "id": 3,
+        "description": "Get Platinum in League of Legends",
+        "status": "IN-PROGRESS",
+        "createdAt": "2026-05-04T15:32:00.770799",
+        "updatedAt": "2026-05-04T17:44:59.415375"
+    },
+    {
+        "id": 4,
+        "description": "Study",
+        "status": "DONE",
+        "createdAt": "2026-05-04T15:32:28.071458",
+        "updatedAt": "2026-05-04T17:44:47.109226"
+    },
+    {
+        "id": 1,
+        "description": "Finish FROM TV Show",
+        "status": "TODO",
+        "createdAt": "2026-05-04T18:24:07.174160",
+        "updatedAt": "2026-05-04T18:24:07.174166"
+    }
+]
