@@ -34,3 +34,33 @@ JSON object for a single expense:
   }
 ]
 """
+
+# expense-tracker.py
+
+# argparse is used for parsing command-line arguments
+import argparse
+
+# json is used for reading and writing expenses to a file
+import json
+
+# os is used for checking if the expenses file exists
+import os
+
+# datetime is used for handling dates of expenses
+from datetime import datetime
+
+EXPENSE_DIR = "data"
+EXPENSE_FILE = os.path.join(EXPENSE_DIR, "expenses.json")
+
+def initialize_storage():
+    """Initialize the storage for expenses."""
+
+    # Create data directory if it doesn't exist
+    if not os.path.exists(EXPENSE_DIR):
+        os.makedirs(EXPENSE_DIR)
+
+    # Create expenses.json file if it doesn't exist
+    if not os.path.exists(EXPENSE_FILE):
+        with open(EXPENSE_FILE, 'w') as f:
+            json.dump([], f)
+
