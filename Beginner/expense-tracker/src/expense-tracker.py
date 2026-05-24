@@ -88,20 +88,82 @@ def save_expenses(expenses):
     with open(EXPENSE_FILE, "w") as file:
         json.dump(expenses, file, indent=4)
 
+    
+def generate_expense_id(expenses):
+    """
+    Generate a unique ID for a new expense.
+
+    Args:
+        expenses (list): The current list of expenses.
+
+    Returns:
+        int: The generated unique ID.
+    """
+    if not expenses:
+        return 1
+    return max(expense["id"] for expense in expenses) + 1
+
+
 """
 Functions for handling expenses will be defined here.
 """
-def add_expense():
-    return True
+def add_expense(description, amount):
+    """
+    Add a new expense to the expense list.
 
-def delete_expense():
-    return True
+    Args:
+        description (str): A short description of the expense.
+        amount (float): The cost of the expense.
+    """
+
+    if amount <= 0:
+        print("Amount must be greater than 0")
+        return
+
+    expenses = load_expenses()
+
+    new_expense = {
+        "id": generate_expense_id(expenses),
+        "date": datetime.now().strftime("%Y-%m-%d"),
+        "description": description,
+        "amount": amount,
+    }
+
+    expenses.append(new_expense)
+    save_expenses(expenses)
+
+    print(f"Expense added successfully (ID: {new_expense['id']})")
+
+
+def delete_expense(expense_id):
+    """
+    Delete an expense from the expense list
+
+    Args:
+        expense_id (int): The ID of the expense to delete.
+    """
+    expenses = load_expenses()
+
+    updated_expenses = [
+        expense for expense in expenses
+        if expense["id"] != expense_id
+    ]
+
+    if len(updated_expenses) == len(expenses):
+        print("Expense ID not found")
+        return
+
+    save_expenses(updated_expenses)
+    print("Expense deleted successfully")
+
 
 def update_expense():
     return True
 
+
 def list_expenses():
     return []
+
 
 def show_summary():
     return 0
