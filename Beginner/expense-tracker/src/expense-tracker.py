@@ -64,3 +64,55 @@ def initialize_storage():
         with open(EXPENSE_FILE, 'w') as f:
             json.dump([], f)
 
+
+def load_expenses():
+    """
+    Load all stored expenses from the JSON file.
+
+    Returns:
+        list: A list containing all expense dictionaries.
+    """
+
+    with open(EXPENSE_FILE, "r") as file:
+        return json.load(file)
+
+
+def save_expenses(expenses):
+    """
+    Save all expenses to the JSON file.
+
+    Args:
+        expenses (list): The updated list of expense dictionaries.
+    """
+
+    with open(EXPENSE_FILE, "w") as file:
+        json.dump(expenses, file, indent=4)
+
+"""
+Functions for handling expenses will be defined here.
+"""
+def add_expense():
+    return True
+
+def delete_expense():
+    return True
+
+def update_expense():
+    return True
+
+def list_expenses():
+    return []
+
+def show_summary():
+    return 0
+
+
+
+
+def main():
+    """
+        Main function to handle command-line arguments and execute corresponding functions.
+    """
+
+    # Initialize storage for expenses
+    initialize_storage()
