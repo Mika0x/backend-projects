@@ -157,8 +157,20 @@ def delete_expense(expense_id):
     print("Expense deleted successfully")
 
 
-def update_expense():
-    return True
+def update_expense(expense_id, description=None, amount=None):
+    expenses = load_expenses()
+
+    for expense in expenses:
+        if expense["id"] == expense_id:
+            if description is not None:
+                expense["description"] = description
+            if amount is not None:
+                expense["amount"] = amount
+            save_expenses(expenses)
+            print("Expense updated successfully")
+            return
+
+    print("Expense ID not found")
 
 
 def list_expenses():
