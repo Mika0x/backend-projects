@@ -192,19 +192,110 @@ def list_expenses():
                 )
 
 
-def show_summary():
-    return 0
+def show_summary(month=None):
+    """
+    Display a summary of expense totals.
+
+    Args:
+        month (int, optional):
+            The month number used to filter expenses.
+            If omitted, all expenses are included.
+    """
+
+    # Load all stored expenses from the JSON file
+    expenses = load_expenses()
+
+    # Exit early if no expenses exist
+    if not expenses:
+        return 0
+
+    # Running total accumulator for expense amounts
+    total_expenses = 0
+
+    # -----------------------
+    # MONTHLY SUMMARY
+    # -----------------------
+
+    # Generate summary for a specific month
+    # only if a month argument was provided
+    if month is not None:
+
+        # Convert month number into readable month name
+        # Example:
+        # 8 -> August
+        month_name = datetime(2026, month, 1).strftime("%B")
+
+        # Iterate through every stored expense
+        for expense in expenses:
+
+            # Convert stored date string into
+            # a datetime object for date operations
+            expense_date = datetime.strptime(
+                expense["date"],
+                "%Y-%m-%d"
+            )
+
+            # Include expense only if its month
+            # matches the requested month
+            if expense_date.month == month:
+                total_expenses += expense["amount"]
+
+        # Display total for requested month
+        print(f"Total expenses for {month_name}: ${total_expenses}")
+
+    # -----------------------
+    # ALL-TIME SUMMARY
+    # -----------------------
+
+    # If no month filter was provided,
+    # calculate total expenses across all records
+    else:
+        for expense in expenses:
+            total_expenses += expense["amount"]
+
+        # Display overall expense total
+        print(f"Total expenses: ${total_expenses}")
 
 
 
 
 def main():
     """
-        Main function to handle command-line arguments and execute corresponding functions.
+    Main function to handle command-line arguments
+    and execute corresponding functions.
     """
 
-    # Initialize storage for expenses
+    # Initialize storage system
     initialize_storage()
+
+    # Create CLI parser
+    parser = create_parser()
+
+    # Parse terminal arguments into Python values
+    args = parser.parse_args()
+
+    # -----------------------
+    # COMMAND ROUTING
+    # -----------------------
+
+    if args.command == "add":
+        add_expense(args.description, args.amount)
+
+    elif args.command == "list":
+        list_expenses()
+
+    elif args.command == "delete":
+        delete_expense(args.id)
+
+    elif args.command == "update":
+        update_expense(
+            args.id,
+            args.description,
+            args.amount
+        )
+
+    elif args.command == "summary":
+        show_summary(args.month)
 
 
 def create_parser():
