@@ -174,7 +174,22 @@ def update_expense(expense_id, description=None, amount=None):
 
 
 def list_expenses():
-    return []
+    """
+    List all expenses in a tabular format.
+    """
+    expenses = load_expenses()
+
+    # TABLE HEADINGS
+    print("ID  Date        Description  Amount")
+
+    if expenses:
+        for expense in expenses:
+            print(
+                f"{expense['id']:<3} "
+                f"{expense['date']:<11} "
+                f"{expense['description']:<12} "
+                f"${expense['amount']:.2f}"
+                )
 
 
 def show_summary():
@@ -190,3 +205,120 @@ def main():
 
     # Initialize storage for expenses
     initialize_storage()
+
+
+def create_parser():
+    """
+    Create and configure the command-line argument parser.
+
+    Returns:
+        argparse.ArgumentParser: The configured parser.
+    """
+
+    # Create the root CLI parser for the application.
+    # This parser is responsible for reading and validating
+    # all command-line input entered by the user.
+    parser = argparse.ArgumentParser(prog="expense-tracker")
+
+
+    # Enable support for subcommands such as:
+    # add, delete, update, list, and summary.
+    #
+    # The selected subcommand will be stored in:
+    # args.command
+    #
+    # required=True ensures the user must provide
+    # a valid command when running the application.
+    subparsers = parser.add_subparsers(
+        dest="command",
+        required=True
+    )
+
+    # -------------
+    # ADD COMMAND #
+    # -------------
+
+    # Create the "add" subcommand parser.
+    # This command is responsible for creating new expenses.
+    add_parser = subparsers.add_parser("add")
+
+    # Required expense description argument.
+    # Example:
+    # --description "Lunch"
+    add_parser.add_argument("--description", required=True)
+
+    # Required expense amount argument.
+    # type=float automatically converts terminal input
+    # into a floating-point number.
+    # Example:
+    # --amount 20
+    add_parser.add_argument("--amount", type=float, required=True)
+
+
+    # --------------
+    # LIST COMMAND #
+    # --------------
+
+    # Create the "list" subcommand parser.
+    # This command displays all stored expenses.
+    #
+    # No additional arguments are required.
+    subparsers.add_parser("list")
+
+
+    # ----------------
+    # DELETE COMMAND #
+    # ----------------
+
+    # Create the "delete" subcommand parser.
+    # This command removes an expense by its ID.
+    delete_parser = subparsers.add_parser("delete")
+
+    # Required expense ID argument.
+    # type=int converts the provided ID into an integer.
+    # Example:
+    # --id 3
+    delete_parser.add_argument("--id", type=int, required=True)
+
+
+    # ---------------- 
+    # UPDATE COMMAND #
+    # ----------------
+
+    # Create the "update" subcommand parser.
+    # This command modifies an existing expense.
+    update_parser = subparsers.add_parser("update")
+
+    # Required expense ID used to locate
+    # the expense being updated.
+    update_parser.add_argument("--id", type=int, required=True)
+
+    # Optional updated description value.
+    # If omitted, existing description remains unchanged.
+    update_parser.add_argument("--description")
+
+    # Optional updated amount value.
+    # If omitted, existing amount remains unchanged.
+    update_parser.add_argument("--amount", type=float)
+
+
+    # -----------------
+    # SUMMARY COMMAND #
+    # -----------------
+
+    # Create the "summary" subcommand parser.
+    # This command calculates total expenses.
+    summary_parser = subparsers.add_parser("summary")
+
+    # Optional month filter argument.
+    # Example:
+    # --month 8
+    #
+    # If omitted, summary includes all expenses.
+    summary_parser.add_argument("--month", type=int)
+
+    return parser
+
+
+if __name__ == "__main__":
+    main()
