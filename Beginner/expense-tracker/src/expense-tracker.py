@@ -1,40 +1,3 @@
-"""
-The list of commands and their expected output is shown below:
-
-$ expense-tracker add --description "Lunch" --amount 20
-# Expense added successfully (ID: 1)
-
-$ expense-tracker add --description "Dinner" --amount 10
-# Expense added successfully (ID: 2)
-
-$ expense-tracker list
-# ID  Date       Description  Amount
-# 1   2024-08-06  Lunch        $20
-# 2   2024-08-06  Dinner       $10
-
-$ expense-tracker summary
-# Total expenses: $30
-
-$ expense-tracker delete --id 2
-# Expense deleted successfully
-
-$ expense-tracker summary
-# Total expenses: $20
-
-$ expense-tracker summary --month 8
-# Total expenses for August: $20
-
-JSON object for a single expense:
-[
-  {
-    "id": 1,
-    "date": "2026-05-24",
-    "description": "Lunch",
-    "amount": 20.0
-  }
-]
-"""
-
 # expense-tracker.py
 
 # argparse is used for parsing command-line arguments
@@ -51,6 +14,15 @@ from datetime import datetime
 
 EXPENSE_DIR = "data"
 EXPENSE_FILE = os.path.join(EXPENSE_DIR, "expenses.json")
+
+# DEFINE THE LIST OF CATEGORIES FOR EXPENSES
+CATEGORIES = [
+    "Food",
+    "Transportation",
+    "Bills",
+    "Entertainment",
+    "Shopping",
+]
 
 def initialize_storage():
     """Initialize the storage for expenses."""
@@ -107,18 +79,22 @@ def generate_expense_id(expenses):
 """
 Functions for handling expenses will be defined here.
 """
-def add_expense(description, amount):
+def add_expense(description, amount, category):
     """
     Add a new expense to the expense list.
 
     Args:
         description (str): A short description of the expense.
         amount (float): The cost of the expense.
+        category (str): A category of the expense.
     """
 
     if amount <= 0:
         print("Amount must be greater than 0")
         return
+    
+    if category.capitalize() not in CATEGORIES:
+        print(f"Invalid category. Please choose a category from the following: \n{CATEGORIES.__str__}")
 
     expenses = load_expenses()
 
@@ -127,6 +103,7 @@ def add_expense(description, amount):
         "date": datetime.now().strftime("%Y-%m-%d"),
         "description": description,
         "amount": amount,
+        "category": category,
     }
 
     expenses.append(new_expense)
@@ -173,24 +150,41 @@ def update_expense(expense_id, description=None, amount=None):
     print("Expense ID not found")
 
 
-def list_expenses():
+def list_expenses(category=None):
     """
-    List all expenses in a tabular format.
+    List expenses in a tabular format.
+
+    Args:
+        category (str, optional):
+            Filter expenses by category.
     """
+
     expenses = load_expenses()
 
-    # TABLE HEADINGS
-    print("ID  Date        Description  Amount")
+    if not expenses:
+        print("No expenses found")
+        return
 
-    if expenses:
-        for expense in expenses:
-            print(
-                f"{expense['id']:<3} "
-                f"{expense['date']:<11} "
-                f"{expense['description']:<12} "
-                f"${expense['amount']:.2f}"
-                )
+    # Filter expenses by category if provided
+    if category is not None:
+        expenses = [
+            expense for expense in expenses
+            if expense["category"] == category
+        ]
 
+    # Table headings
+    print("ID  Date        Description  Category        Amount")
+
+    # Print each expense row
+    for expense in expenses:
+        print(
+            f"{expense['id']:<3} "
+            f"{expense['date']:<11} "
+            f"{expense['description']:<12} "
+            f"{expense['category']:<15} "
+            f"${expense['amount']:.2f}"
+        )
+                
 
 def show_summary(month=None):
     """
@@ -220,6 +214,9 @@ def show_summary(month=None):
     # only if a month argument was provided
     if month is not None:
 
+        # Current calendar year
+        current_year = datetime.now().year
+
         # Convert month number into readable month name
         # Example:
         # 8 -> August
@@ -235,9 +232,13 @@ def show_summary(month=None):
                 "%Y-%m-%d"
             )
 
-            # Include expense only if its month
-            # matches the requested month
-            if expense_date.month == month:
+            # Only include expenses matching:
+            # - requested month
+            # - current year
+            if (
+                expense_date.month == month
+                and expense_date.year == current_year
+            ):
                 total_expenses += expense["amount"]
 
         # Display total for requested month
@@ -279,10 +280,10 @@ def main():
     # -----------------------
 
     if args.command == "add":
-        add_expense(args.description, args.amount)
+        add_expense(args.description, args.amount, args.category)
 
     elif args.command == "list":
-        list_expenses()
+        list_expenses(args.category)
 
     elif args.command == "delete":
         delete_expense(args.id)
@@ -345,6 +346,11 @@ def create_parser():
     # --amount 20
     add_parser.add_argument("--amount", type=float, required=True)
 
+    # Required expense category argument.
+    # Example:
+    # --category "Bills"
+    add_parser.add_argument("--category", required=True)
+
 
     # --------------
     # LIST COMMAND #
@@ -354,7 +360,11 @@ def create_parser():
     # This command displays all stored expenses.
     #
     # No additional arguments are required.
-    subparsers.add_parser("list")
+    list_parser = subparsers.add_parser("list")
+
+    # Optional category filter value
+    # If omitted, display all expenses
+    list_parser.add_argument("--category")
 
 
     # ----------------
