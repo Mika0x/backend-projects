@@ -12,8 +12,12 @@ import os
 # datetime is used for handling dates of expenses
 from datetime import datetime
 
+# calendar is used for converting month number to month name
+import calendar
+
 EXPENSE_DIR = "data"
 EXPENSE_FILE = os.path.join(EXPENSE_DIR, "expenses.json")
+BUDGET_FILE = os.path.join(EXPENSE_DIR, "budgets.json")
 
 # DEFINE THE LIST OF CATEGORIES FOR EXPENSES
 CATEGORIES = [
@@ -36,6 +40,11 @@ def initialize_storage():
         with open(EXPENSE_FILE, 'w') as f:
             json.dump([], f)
 
+    # Create budgets.json file if it doesn't exist
+    if not os.path.exists(BUDGET_FILE):
+        with open(BUDGET_FILE, 'w') as f:
+            json.dump([], f)
+
 
 def load_expenses():
     """
@@ -49,6 +58,18 @@ def load_expenses():
         return json.load(file)
 
 
+def load_budgets():
+    """
+    Load all stored budgets for each month from the JSON file.
+
+    Returns:
+        list: A list containing all budget dictionaries.
+    """
+
+    with open(BUDGET_FILE, "r") as file:
+        return json.load(file)
+
+
 def save_expenses(expenses):
     """
     Save all expenses to the JSON file.
@@ -59,6 +80,18 @@ def save_expenses(expenses):
 
     with open(EXPENSE_FILE, "w") as file:
         json.dump(expenses, file, indent=4)
+
+
+def save_budgets(budgets):
+    """
+    Save all budgets to the JSON file.
+
+    Args:
+        budgets (list): The updated list of budget dictionaries.
+    """
+
+    with open(BUDGET_FILE, "w") as file:
+        json.dump(budgets, file, indent=4)
 
     
 def generate_expense_id(expenses):
@@ -258,6 +291,49 @@ def show_summary(month=None):
         print(f"Total expenses: ${total_expenses}")
 
 
+def add_budget(month, amount):
+
+    budgets = load_budgets()
+
+    month_name = calendar.month_name[month]
+
+    for budget in budgets:
+
+        if budget["month"] == month_name:
+
+            budget["amount"] = amount
+
+            save_budgets(budgets)
+
+            print(
+
+                f"Updated {month_name} "
+
+                f"budget to ${amount:.2f}"
+
+            )
+
+            return
+
+    budget = {
+
+        "month": month_name,
+
+        "amount": amount
+
+    }
+
+    budgets.append(budget)
+
+    save_budgets(budgets)
+
+    print(
+
+        f"Budget set for {month_name}: "
+
+        f"${amount:.2f}"
+
+    )
 
 
 def main():
@@ -297,6 +373,9 @@ def main():
 
     elif args.command == "summary":
         show_summary(args.month)
+
+    elif args.command == "budget":
+        add_budget(args.month, args.amount)
 
 
 def create_parser():
@@ -417,6 +496,27 @@ def create_parser():
     #
     # If omitted, summary includes all expenses.
     summary_parser.add_argument("--month", type=int)
+
+
+    # -----------------
+    # BUDGET COMMAND #
+    # -----------------
+
+    # Create the "budget" subcommand parser.
+    # This command sets the budget of a given month.
+    budget_parser = subparsers.add_parser("budget")
+
+    # Required budget month argument.
+    # Example:
+    # --description "8"
+    budget_parser.add_argument("--month", type=int, required=True)
+
+    # Required budget amount argument.
+    # type=float automatically converts terminal input
+    # into a floating-point number.
+    # Example:
+    # --amount 20
+    budget_parser.add_argument("--amount", type=float, required=True)
 
     return parser
 
