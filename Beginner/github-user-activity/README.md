@@ -7,7 +7,7 @@ formatting.
 
 🔗 Project Source: https://roadmap.sh/projects/github-user-activity
 
-🔗 Repository: [https://github.com/Mika0x/github-user-activity](https://github.com/Mika0x/backend-projects/tree/main/Beginner/github-user-activity)
+🔗 Repository: [https://github.com/Mika0x/backend-projects/tree/main/Beginner/github-user-activity](https://github.com/Mika0x/backend-projects/Beginner/github-user-activity)
 
 ---
 
