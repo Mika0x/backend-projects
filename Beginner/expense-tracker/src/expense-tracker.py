@@ -15,9 +15,13 @@ from datetime import datetime
 # calendar is used for converting month number to month name
 import calendar
 
+# csv is used for exporting expenses stored in json format to a column separated value file
+import csv
+
 EXPENSE_DIR = "data"
 EXPENSE_FILE = os.path.join(EXPENSE_DIR, "expenses.json")
 BUDGET_FILE = os.path.join(EXPENSE_DIR, "budgets.json")
+EXPORT_FILE = os.path.join(EXPENSE_DIR, "expenses.csv")
 
 # DEFINE THE LIST OF CATEGORIES FOR EXPENSES
 CATEGORIES = [
@@ -352,46 +356,52 @@ def show_summary(month=None):
 def add_budget(month, amount):
 
     budgets = load_budgets()
-
     month_name = calendar.month_name[month]
 
     for budget in budgets:
-
         if budget["month"] == month_name:
-
             budget["amount"] = amount
-
             save_budgets(budgets)
-
             print(
-
                 f"Updated {month_name} "
-
                 f"budget to ${amount:.2f}"
-
             )
-
             return
 
     budget = {
-
         "month": month_name,
-
         "amount": amount
-
     }
 
     budgets.append(budget)
-
     save_budgets(budgets)
 
     print(
-
         f"Budget set for {month_name}: "
-
         f"${amount:.2f}"
-
     )
+
+
+def export_expenses_to_csv():
+    """
+    Export all expenses to a CSV file.
+    """
+
+    expenses = load_expenses()
+
+    if not expenses:
+        print("No expenses found to export")
+        return
+
+    with open(EXPORT_FILE, "w", newline="") as file:
+        fieldnames = ["id", "date", "description", "category", "amount"]
+
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+
+        writer.writeheader()
+        writer.writerows(expenses)
+
+    print(f"Expenses exported successfully to {EXPORT_FILE}")
 
 
 def main():
@@ -434,6 +444,9 @@ def main():
 
     elif args.command == "budget":
         add_budget(args.month, args.amount)
+
+    elif args.command == "export":
+        export_expenses_to_csv()
 
 
 def create_parser():
@@ -575,6 +588,15 @@ def create_parser():
     # Example:
     # --amount 20
     budget_parser.add_argument("--amount", type=float, required=True)
+
+
+    # -----------------
+    # EXPORT COMMAND #
+    # -----------------
+
+    # Create the "export" subcommand parser.
+    # This command exports expenses to a CSV file.
+    subparsers.add_parser("export")
 
     return parser
 
