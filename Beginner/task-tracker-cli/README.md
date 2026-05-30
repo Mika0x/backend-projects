@@ -5,7 +5,7 @@ This project allows users to create, update, delete, and track the status of tas
 
 🔗 Project Source: https://roadmap.sh/projects/task-tracker
 
-🔗 Repository: https://github.com/Mika0x/task-tracker-cli
+🔗 Repository: [https://github.com/Mika0x/task-tracker-cli](https://github.com/Mika0x/backend-projects/tree/main/Beginner/task-tracker-cli)
 
 ---
 
