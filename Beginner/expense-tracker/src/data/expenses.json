@@ -19,5 +19,19 @@
         "description": "Netflix",
         "amount": 24.99,
         "category": "Entertainment"
+    },
+    {
+        "id": 4,
+        "date": "2026-05-30",
+        "description": "Shoes",
+        "amount": 10.0,
+        "category": "Shopping"
+    },
+    {
+        "id": 5,
+        "date": "2026-05-30",
+        "description": "PS5",
+        "amount": 70.0,
+        "category": "Entertainment"
     }
 ]

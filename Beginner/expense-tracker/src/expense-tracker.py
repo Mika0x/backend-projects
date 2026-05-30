@@ -94,6 +94,37 @@ def save_budgets(budgets):
         json.dump(budgets, file, indent=4)
 
     
+def get_monthly_expense_total(month):
+    expenses = load_expenses()
+    current_year = datetime.now().year
+    total = 0
+
+    for expense in expenses:
+        expense_date = datetime.strptime(
+            expense["date"],
+            "%Y-%m-%d"
+        )
+
+        if (
+            expense_date.month == month
+            and expense_date.year == current_year
+        ):
+            total += expense["amount"]
+
+    return total
+
+
+def get_budget_for_month(month):
+    budgets = load_budgets()
+    month_name = datetime(datetime.now().year, month, 1).strftime("%B")
+
+    for budget in budgets:
+        if budget["month"] == month_name:
+            return budget["amount"]
+
+    return None
+
+
 def generate_expense_id(expenses):
     """
     Generate a unique ID for a new expense.
@@ -125,9 +156,15 @@ def add_expense(description, amount, category):
     if amount <= 0:
         print("Amount must be greater than 0")
         return
-    
-    if category.capitalize() not in CATEGORIES:
-        print(f"Invalid category. Please choose a category from the following: \n{CATEGORIES.__str__}")
+
+    category = category.capitalize()
+
+    if category not in CATEGORIES:
+        print(
+            "Invalid category. Please choose from: "
+            f"{', '.join(CATEGORIES)}"
+        )
+        return
 
     expenses = load_expenses()
 
@@ -143,6 +180,27 @@ def add_expense(description, amount, category):
     save_expenses(expenses)
 
     print(f"Expense added successfully (ID: {new_expense['id']})")
+
+    expense_month = datetime.now().month
+    monthly_total = get_monthly_expense_total(expense_month)
+    monthly_budget = get_budget_for_month(expense_month)
+
+    if monthly_budget is not None and monthly_total > monthly_budget:
+        month_name = datetime.now().strftime("%B")
+
+        print(
+            f"Warning: You have exceeded your "
+            f"{month_name} budget of "
+            f"${monthly_budget:.2f}"
+        )
+    budgets = load_budgets()
+    month_name = datetime(datetime.now().year, expense_month, 1).strftime("%B")
+
+    for budget in budgets:
+        if budget["month"] == month_name:
+            return budget["amount"]
+
+    return None
 
 
 def delete_expense(expense_id):
